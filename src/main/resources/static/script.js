@@ -1,9 +1,9 @@
 // ─── CONFIGURAÇÃO DE AMBIENTE ─────────────────────────────────────────────────
 // LOCAL: descomente a linha abaixo e comente a linha PRODUÇÃO
- const BASE_URL = 'http://localhost:8080';
+//const BASE_URL = 'http://localhost:8080';
 
 // PRODUÇÃO (Render): deixe assim para subir
-//const BASE_URL = '';
+const BASE_URL = '';
 // ─────────────────────────────────────────────────────────────────────────────
 
 let stompClient = null;
