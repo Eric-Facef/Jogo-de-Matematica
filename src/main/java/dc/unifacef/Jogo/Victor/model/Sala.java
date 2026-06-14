@@ -8,6 +8,8 @@ public class Sala {
     private Map<String, Jogador> jogadores = new ConcurrentHashMap<>();
     private boolean jogoIniciado = false;
     private String nomeHost = null;
+    private String nomeEquipe = null;
+    private boolean jogoEncerradoPorTempo = false;
     private long tempoInicialMilis;
 
     private int tempoRestante = 25 * 60;
@@ -15,9 +17,16 @@ public class Sala {
     private boolean lockdownAtivo = false;
     private int tempoLockdown = 0;
 
+    // Fases: 1=Fios, 2=Alinhamento Quântico, 3=Tokens, 4=Aguardando Desarme
     private int faseAtualOperador = 1;
+
+    // Fase 2 — Alinhamento Quântico
+    private boolean sequenciaQuadrantesCorreta = false;
+
+    // Fase 3 — Tokens
     private boolean dadosInterceptadosFase2 = false;
     private boolean dadosInterceptadosFase3 = false;
+
     private boolean jogoDesarmado = false;
 
     public Sala(String codigo) {
@@ -33,7 +42,6 @@ public class Sala {
     }
 
     public boolean selecionarFuncao(String idSessao, String novaFuncao) {
-        // ANALISTA pode ser escolhido por múltiplos (apenas função que permite duplicata)
         if (!novaFuncao.equals("ANALISTA")) {
             for (Jogador j : jogadores.values()) {
                 if (novaFuncao.equals(j.getFuncao())) return false;
@@ -49,13 +57,12 @@ public class Sala {
 
     // ── PENALIDADE ────────────────────────────────────────────────
     public void aplicarPenalidadeGlobal() {
-        // Proteção: não penaliza tempo abaixo de 0
         this.tempoRestante = Math.max(0, this.tempoRestante - 120);
         this.falhasGlobais++;
         if (this.falhasGlobais >= 3) {
             this.lockdownAtivo = true;
             this.tempoLockdown = 30;
-            this.falhasGlobais = 0; // Zera contador após ativar lockdown
+            this.falhasGlobais = 0;
         }
     }
 
@@ -86,6 +93,8 @@ public class Sala {
     public int getTempoLockdown() { return tempoLockdown; }
     public int getFaseAtualOperador() { return faseAtualOperador; }
     public void setFaseAtualOperador(int v) { this.faseAtualOperador = v; }
+    public boolean isSequenciaQuadrantesCorreta() { return sequenciaQuadrantesCorreta; }
+    public void setSequenciaQuadrantesCorreta(boolean v) { this.sequenciaQuadrantesCorreta = v; }
     public boolean isDadosInterceptadosFase2() { return dadosInterceptadosFase2; }
     public void setDadosInterceptadosFase2(boolean v) { this.dadosInterceptadosFase2 = v; }
     public boolean isDadosInterceptadosFase3() { return dadosInterceptadosFase3; }
@@ -94,6 +103,10 @@ public class Sala {
     public void setJogoDesarmado(boolean v) { this.jogoDesarmado = v; }
     public String getNomeHost() { return nomeHost; }
     public void setNomeHost(String v) { this.nomeHost = v; }
+    public String getNomeEquipe() { return nomeEquipe; }
+    public void setNomeEquipe(String v) { this.nomeEquipe = v; }
+    public boolean isJogoEncerradoPorTempo() { return jogoEncerradoPorTempo; }
+    public void setJogoEncerradoPorTempo(boolean v) { this.jogoEncerradoPorTempo = v; }
 
     public void registrarInicio() {
         this.tempoInicialMilis = System.currentTimeMillis();

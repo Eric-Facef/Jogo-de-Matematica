@@ -57,6 +57,7 @@
         <div class="terminal-input" style="margin: 10px 0;">
             <div style="display: flex; flex-direction: column; gap: 8px;">
                 <input type="text" id="inputNomeJogador" placeholder="SEU CODINOME DE AGENTE">
+                <input type="text" id="inputNomeEquipe" placeholder="NOME DA EQUIPE (só para quem cria a sala)" style="border-color: #a855f7; color: #a855f7;">
                 <div style="display: flex; gap: 10px; width: 100%;">
                     <button onclick="criarNovaSala()" style="background: #111; font-size: 0.8rem;">CRIAR SALA</button>
                     <input type="text" id="inputCodigoSala" placeholder="CÓDIGO" style="max-width: 110px; text-transform: uppercase;">
@@ -125,10 +126,39 @@
             </div>
         </div>
 
-        <!-- FASE 2: TOKENS -->
+        <!-- FASE 2: ALINHAMENTO QUÂNTICO -->
         <div id="op-fase2" style="display: none;">
+            <div class="pista-item" style="border-left: 3px solid #a855f7; margin-bottom: 15px;">
+                <span style="color: #a855f7; font-weight: bold;">🔮 FASE 2: ALINHAMENTO QUÂNTICO</span>
+                <p>Os quadrantes do barramento precisam ser calibrados. Aguarde os Analistas calcularem a sequência correta das figuras e insira os valores na ordem indicada.</p>
+            </div>
+
+            <div class="terminal-input">
+                <p>Insira a sequência dos quadrantes (fornecida pelos Analistas):</p>
+                <div style="display: flex; gap: 10px; margin-top: 10px; justify-content: center;">
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 6px;">
+                        <label style="font-size: 0.75rem; color: #888;">Q1</label>
+                        <input type="number" id="quadrante1" placeholder="?" style="width: 70px; text-align: center; font-size: 1.3rem;">
+                    </div>
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 6px;">
+                        <label style="font-size: 0.75rem; color: #888;">Q2</label>
+                        <input type="number" id="quadrante2" placeholder="?" style="width: 70px; text-align: center; font-size: 1.3rem;">
+                    </div>
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 6px;">
+                        <label style="font-size: 0.75rem; color: #888;">Q3</label>
+                        <input type="number" id="quadrante3" placeholder="?" style="width: 70px; text-align: center; font-size: 1.3rem;">
+                    </div>
+                </div>
+                <button onclick="inserirSequenciaQuadrantes()" style="margin-top: 15px; background: #a855f7; border-color: #a855f7; color: white; font-weight: bold;">
+                    🔮 CALIBRAR QUADRANTES
+                </button>
+            </div>
+        </div>
+
+        <!-- FASE 3: TOKENS -->
+        <div id="op-fase3" style="display: none;">
             <div class="pista-item" style="border-left: 3px solid var(--accent-color); margin-bottom: 15px;">
-                <span style="color: var(--accent-color); font-weight: bold;">⚠️ STATUS CRÍTICO - TERMINAL TRANCADO</span>
+                <span style="color: var(--accent-color); font-weight: bold;">⚠️ FASE 3: TERMINAL TRANCADO</span>
                 <p>Os módulos de decodificação estão trancados. Digite a sequência de chaves corretas recebidas da equipe para liberar os barramentos.</p>
             </div>
 
@@ -154,10 +184,10 @@
             </button>
         </div>
 
-        <!-- FASE 3: AGUARDANDO INVESTIGADOR -->
-        <div id="op-fase3" style="display: none;">
+        <!-- FASE 4: AGUARDANDO INVESTIGADOR -->
+        <div id="op-fase4" style="display: none;">
             <div class="pista-item" style="border-left: 3px solid var(--green-glow);">
-                <span style="color: var(--green-glow); font-weight: bold;">✓ BARRAMENTOS LIBERADOS</span>
+                <span style="color: var(--green-glow); font-weight: bold;">✓ BARRAMENTOS LIBERADOS — FASE 4</span>
                 <p>Controle de terminação transferido com sucesso. Aguarde o <strong>Investigador</strong> inserir os dados lógicos e calibrar a tensão no Painel C para desarmar o sistema.</p>
             </div>
         </div>
@@ -177,10 +207,10 @@
                 <tr><th>Fio</th><th>Equação de Ressonância</th><th>Resultado (X)</th></tr>
             </thead>
             <tbody>
-                <tr><td style="color:#60a5fa; font-weight:bold;">FIO AZUL</td><td>√(X + 4) + 2 = X</td><td style="color:#60a5fa;">5</td></tr>
-                <tr><td style="color:#f87171; font-weight:bold;">FIO VERMELHO</td><td>(X − 1) / (X + 2) = 2/5</td><td style="color:#f87171;">3</td></tr>
-                <tr><td style="color:#fbbf24; font-weight:bold;">FIO AMARELO</td><td>4(X − 2) − 3(X + 1) = 2X − 7</td><td style="color:#fbbf24;">−4</td></tr>
-                <tr><td style="color:#4ade80; font-weight:bold;">FIO VERDE</td><td>(2X − 3)/4 + (X + 5)/2 = 7</td><td style="color:#4ade80;">21/4</td></tr>
+                <tr><td style="color:#60a5fa; font-weight:bold;">FIO AZUL</td><td>√(X + 4) + 2 = X</td><td style="color:#60a5fa;">?</td></tr>
+                <tr><td style="color:#f87171; font-weight:bold;">FIO VERMELHO</td><td>(X − 1) / (X + 2) = 2/5</td><td style="color:#f87171;">?</td></tr>
+                <tr><td style="color:#fbbf24; font-weight:bold;">FIO AMARELO</td><td>4(X − 2) − 3(X + 1) = 2X − 7</td><td style="color:#fbbf24;">?</td></tr>
+                <tr><td style="color:#4ade80; font-weight:bold;">FIO VERDE</td><td>(2X − 3)/4 + (X + 5)/2 = 7</td><td style="color:#4ade80;">?</td></tr>
             </tbody>
         </table>
 
@@ -190,16 +220,16 @@
                 <tr><th>Equação</th><th>Resultado</th></tr>
             </thead>
             <tbody>
-                <tr><td>🟢 − 🟦 = ?</td><td>−3</td></tr>
-                <tr><td>🟦 + 🔺 = ?</td><td>11</td></tr>
-                <tr><td>🟢 − 🔺 = ?</td><td>4</td></tr>
+                <tr><td>🟢 − 🟦 = ?</td><td>?</td></tr>
+                <tr><td>🟦 + 🔺 = ?</td><td>?</td></tr>
+                <tr><td>🟢 − 🔺 = ?</td><td>?</td></tr>
             </tbody>
         </table>
         <div class="pista-item" style="border-left: 3px solid #a855f7; margin-top: 10px;">
             <span style="color: #a855f7; font-weight: bold;">📐 PROCEDIMENTO — SEÇÃO 2: ALINHAMENTO QUÂNTICO</span>
-            <p style="margin-top: 6px;">Resolva o sistema de equações acima para encontrar os valores de cada figura. Em seguida, aplique as regras de ordenação para determinar a sequência correta a ser inserida pelo Investigador no Painel C.</p>
+            <p style="margin-top: 6px;">Resolva o sistema de equações acima para encontrar os valores de cada figura. Passe os valores para os Analistas — eles aplicarão as regras de ordenação e comunicarão a sequência ao Operador.</p>
             <p style="margin-top: 6px; font-size: 0.8rem; color: #aaa;"><strong>Regras de ordenação (aplique a primeira que se encaixar):</strong><br>
-            1. Se <strong>dois</strong> dos três valores forem divisíveis por 3 → coloque o <strong>maior no meio</strong> e o <strong>menor em último</strong> (ordem: médio, maior, menor).<br>
+            1. Se <strong>dois</strong> dos três valores forem divisíveis por 3 → coloque o <strong>maior no meio</strong> e o <strong>menor em último</strong>.<br>
             2. Se apenas <strong>um</strong> valor for divisível por 4 → coloque do <strong>maior para o menor</strong>.<br>
             3. Se apenas <strong>um</strong> valor for divisível por 3 → coloque do <strong>menor para o maior</strong>.<br>
             <span style="color:#fbbf24;">⚠️ Verifique as condições nessa ordem — pare na primeira que for verdadeira.</span></p>
@@ -223,7 +253,7 @@
                     <tr><td>1 🔋</td><td>Do maior para o menor</td><td>Soma todos × 4 ÷ 10</td></tr>
                     <tr><td>2 🔋</td><td>Do menor para o maior</td><td>Maior × menor ÷ 2º menor</td></tr>
                     <tr><td>3 🔋</td><td>Mesma ordem do barramento</td><td>Soma só os pares ÷ 2</td></tr>
-                    <tr style="background: rgba(255,51,51,0.15);"><td><strong>4 🔋</strong></td><td><strong>Ordem INVERSA do barramento</strong></td><td><strong>(Maior − Menor) ÷ 3</strong></td></tr>
+                    <tr><td><strong>4 🔋</strong></td><td><strong>Ordem INVERSA do barramento</strong></td><td><strong>(Maior − Menor) ÷ 3</strong></td></tr>
                     <tr><td>5 🔋</td><td>Apenas valores de A e B</td><td>Soma todos × 30% (arredondar)</td></tr>
                 </tbody>
             </table>
@@ -246,7 +276,7 @@
     <div id="screen-analistas" class="screen">
         <div class="nav-back"><button onclick="sairDoTerminal()">← Sair do Terminal</button></div>
         <h2>Terminal de Criptoanálise</h2>
-        <p style="margin-bottom: 15px;">Monitore a rede e resolva os polinômios estruturais para dar suporte ao Operador.</p>
+        <p style="margin-bottom: 15px;">Monitore a rede e resolva os enigmas para dar suporte ao Operador.</p>
 
         <!-- Fase 1: aguardando -->
         <div id="pista-fase1-analista-aguardo">
@@ -265,41 +295,37 @@
             </div>
         </div>
 
-        <!-- Fase 2: enigma liberado -->
-        <div id="pista-fase2-analista" style="display: none; margin-top: 20px;">
-            <div class="pista-item" style="border-left: 3px solid #fbbf24;">
-                <span style="color: #fbbf24; font-weight: bold;">📊 ENIGMA DA CHAVE ALFA LIBERADO</span>
-                <p style="font-weight: bold; color: var(--cyber-blue); margin-top: 5px;">Polinômio do Kernel: P(x) = x² − 28x + 192 = 0</p>
-                <p style="margin-top: 6px; font-size: 0.85rem; color:#aaa;">Instrução: Descubra as raízes reais. A Chave Alfa requerida pelo Operador é exatamente o valor da <strong>soma dessas duas raízes (x₁ + x₂)</strong>.</p>
+        <!-- Fase 2: Alinhamento Quântico — Analista recebe valores do Especialista e descobre a ordem -->
+        <div id="pista-fase2-analista-quantico" style="display: none; margin-top: 20px;">
+            <div class="terminal-status" style="color: #a855f7;"><span>🔮 Alinhamento Quântico</span> <span>ATIVO</span></div>
+            <div class="pista-item" style="border-left: 3px solid #a855f7;">
+                <span style="color: #a855f7; font-weight: bold;">📊 ENIGMA DE CALIBRAÇÃO DOS QUADRANTES</span>
+                <p style="margin-top: 6px;">O Especialista resolverá o sistema de equações das figuras e passará os valores para você. Aplique as regras de ordenação abaixo e comunique a sequência ao Operador.</p>
+            </div>
+            <div class="pista-item" style="border-left: 3px solid #fbbf24; margin-top: 10px;">
+                <span style="color: #fbbf24; font-weight: bold;">📋 REGRAS DE ORDENAÇÃO — SEÇÃO 2</span>
+                <ul style="margin-top: 8px; font-size: 0.82rem; line-height: 1.8; color: #ccc;">
+                    <li>Se as três figuras tiverem valores <strong>iguais</strong> → coloque a soma das três nos três quadrantes.</li>
+                    <li>Se <strong>dois</strong> valores forem divisíveis por 3 → maior no meio, menor em último.</li>
+                    <li>Se apenas <strong>um</strong> valor for divisível por 4 → do maior para o menor.</li>
+                    <li>Se apenas <strong>um</strong> valor for divisível por 3 → do menor para o maior.</li>
+                    <span style="color:#fbbf24; font-size:0.8rem;">⚠️ Aplique a primeira regra que se encaixar.</span>
+                </ul>
             </div>
         </div>
 
-        <div class="pista-item" style="border-left: 3px solid var(--accent-color); margin-top: 20px;">
-            <span style="color: var(--accent-color); font-weight: bold;">📋 REGRAS DE CORTE — SEÇÃO 1</span>
-            <ul style="margin-top: 8px; font-size: 0.82rem; line-height: 1.7; color: #ccc;">
-                <li>Se dois fios tiverem resultado igual: pilhas ímpares → menor resultado | pilhas pares → fio verde</li>
-                <li>Se todos diferentes e houver <strong>1 negativo maior que −3</strong> → fio azul</li>
-                <li>Se todos diferentes e houver <strong>2 negativos</strong> → fio divisível por 3</li>
-                <li>Se existir fio PRETO: negativo abaixo → corte o de baixo | positivo abaixo → corte o de cima</li>
-                <li>Se em ordem crescente (cima→baixo) → corte o último</li>
-                <li>Se em ordem decrescente → corte o primeiro</li>
-                <li>Se houver exatamente <strong>3 inteiros positivos</strong> → corte o de maior valor</li>
-                <li>Se <strong>todos</strong> forem positivos → corte o maior resultado</li>
-                <li>Se nenhuma condição anterior → corte o fio do <strong>menor resultado positivo</strong></li>
-            </ul>
-        </div>
+        <!-- Fase 3+: Chave Alfa -->
+        <div id="pista-fase2-analista" style="display: none; margin-top: 20px;">
+            <div class="pista-item" style="border-left: 3px solid #fbbf24;">
+                <span style="color: #fbbf24; font-weight: bold;">📊 ENIGMA DA CHAVE ALFA LIBERADO — FASE 3</span>
+                <p style="font-weight: bold; color: var(--cyber-blue); margin-top: 5px;">Polinômio do Kernel: P(x) = x² − 28x + 192 = 0</p>
+                <p style="margin-top: 6px; font-size: 0.85rem; color:#aaa;">Instrução: Descubra as raízes reais. A Chave Alfa requerida pelo Operador é exatamente o valor da <strong>soma dessas duas raízes (x₁ + x₂)</strong>.</p>
+            </div>
 
-        <div class="pista-item" style="border-left: 3px solid #fbbf24; margin-top: 15px;">
-            <span style="color: #fbbf24; font-weight: bold;">📡 RESULTADOS DOS FIOS — MÓDULO B</span>
-            <table style="margin-top: 10px; width: 100%;">
-                <thead><tr><th>Fio</th><th>Resultado (X)</th></tr></thead>
-                <tbody>
-                    <tr><td style="color:#60a5fa;">🔵 AZUL</td><td style="color:#60a5fa; font-weight:bold;">5</td></tr>
-                    <tr><td style="color:#f87171;">🔴 VERMELHO</td><td style="color:#f87171; font-weight:bold;">3</td></tr>
-                    <tr><td style="color:#fbbf24;">🟡 AMARELO</td><td style="color:#fbbf24; font-weight:bold;">−4</td></tr>
-                    <tr><td style="color:#4ade80;">🟢 VERDE</td><td style="color:#4ade80; font-weight:bold;">21/4</td></tr>
-                </tbody>
-            </table>
+            <div class="pista-item" style="border-left: 3px solid var(--accent-color); margin-top: 10px;">
+                <span style="color: var(--accent-color); font-weight: bold;">🔐 ENIGMA DO TOKEN DE REDE</span>
+                <p style="margin-top: 5px; font-size: 0.85rem;">O Token de Infecção é o número de soluções inteiras positivas de: <strong style="color: var(--cyber-blue);">x² − 12x + 27 ≤ 0</strong>. Passe ao Investigador.</p>
+            </div>
         </div>
     </div>
 
@@ -344,25 +370,32 @@
             </div>
         </div>
 
+        <!-- Fase 3+: Token de Infecção -->
         <div id="pista-fase2-investigador" style="display: none; margin-top: 15px;">
             <div class="terminal-status" style="color: var(--green-glow);"><span>🖧 Banco de Dados Governamental</span> <span>INFILTRADO (100%)</span></div>
             <div class="pista-item" style="border-left: 3px solid #fbbf24;">
                 <span style="color: #fbbf24; font-weight: bold;">[ALERTA INTERCEPTADO]: SEGURANÇA MATRIX</span>
-                <p>"Injetem o vetor de bypass ativo no terminal do Operador: <strong style="color: var(--accent-color);">NET-ALPHA-22</strong>. Para o desarme final (Ato III), a ordem dos símbolos no Código Estrutural deve seguir estritamente o protocolo de Alinhamento Quântico — consulte o Manual do Especialista para determinar a sequência correta das figuras (maior no meio, menor em último)."</p>
+                <p>"Injetem o vetor de bypass ativo no terminal do Operador: <strong style="color: var(--accent-color);">NET-ALPHA-22</strong>. Para o desarme final (Ato IV), a ordem dos símbolos no Código Estrutural deve seguir estritamente o protocolo de Alinhamento Quântico — consulte o Manual do Especialista para determinar a sequência correta das figuras (maior no meio, menor em último)."</p>
             </div>
         </div>
 
+        <!-- Fase 4: Formulário de Desarme Final -->
         <div id="formulario-desarme-final" style="display: none; margin-top: 25px; border-top: 1px dashed #333; padding-top: 15px;">
             <div class="terminal-status" style="color: var(--accent-color);"><span>⚡ ACESSO AO REATOR DISPONÍVEL</span> <span>PRONTO</span></div>
             <div class="terminal-input">
                 <p>Ordem Numérica dos Símbolos Criptográficos:</p>
-                <p style="font-size:0.75rem; color:#888; margin-top:2px;">Formato: X-X-X-X-X (ex: 57-6-18-7-31)</p>
+                <p style="font-size:0.75rem; color:#888; margin-top:2px;">Formato: X-X-X-X-X (ex: ?-?-?-?-?)</p>
                 <input type="text" id="inputCodigo" placeholder="X-X-X-X-X" style="width:100%; margin-top:6px;" oninput="this.value=this.value.replace(/[^0-9-]/g,'')">
             </div>
             <div class="terminal-input" style="margin-top: 10px;">
                 <p>Valor Escalar de Calibração de Tensão:</p>
                 <p style="font-size:0.75rem; color:#888; margin-top:2px;">Apenas número inteiro</p>
                 <input type="number" id="inputValor" placeholder="00" style="width:100%; margin-top:6px;">
+            </div>
+            <div class="terminal-input" style="margin-top: 10px;">
+                <p>Token de Verificação Final:</p>
+                <p style="font-size:0.75rem; color:#888; margin-top:2px;">Resolva: x² − 12x + 27 ≤ 0 — quantas soluções inteiras positivas existem?</p>
+                <input type="number" id="inputTokenFase4" placeholder="00" style="width:100%; margin-top:6px;">
             </div>
             <br>
             <button class="btn-desarmar" onclick="tentarDesarmarFinal()" style="width: 100%; background: var(--accent-color); color: white; font-weight: bold; font-size: 1rem; padding: 16px;">💥 DISPARAR PROTOCOLO DE DESARME FINAL 💥</button>
@@ -384,8 +417,25 @@
         </table>
     </div>
 
-</div>
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <!-- TELA: DERROTA (tempo esgotado)                            -->
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <div id="screen-derrota" class="screen">
+        <div style="text-align: center; padding: 20px 10px;">
+            <h2 style="color: var(--accent-color); font-size: 2rem; letter-spacing: 2px;">💀 MISSÃO FALHOU 💀</h2>
+            <p style="color: #f87171; font-size: 1rem; margin-top: 10px;">O protocolo de contenção foi comprometido.</p>
+            <div style="background: #0f0000; border: 2px dashed var(--accent-color); border-radius: 8px; padding: 20px; margin: 20px 0;">
+                <p style="color: #fca5a5; font-size: 0.95rem; line-height: 1.8;">
+                    ⚠️ O tempo de neutralização expirou.<br>
+                    O vírus se propagou pela rede governamental.<br>
+                    <strong style="color: var(--accent-color);">Falha crítica registrada nos servidores centrais.</strong>
+                </p>
+            </div>
+            <p style="color: #6b7280; font-size: 0.8rem;">Recarregue a página para iniciar uma nova missão.</p>
+        </div>
+    </div>
 
+</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 <script src="script.js"></script>

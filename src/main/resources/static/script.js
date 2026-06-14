@@ -1,3 +1,11 @@
+// ─── CONFIGURAÇÃO DE AMBIENTE ─────────────────────────────────────────────────
+// LOCAL: descomente a linha abaixo e comente a linha PRODUÇÃO
+ const BASE_URL = 'http://localhost:8080';
+
+// PRODUÇÃO (Render): deixe assim para subir
+//const BASE_URL = '';
+// ─────────────────────────────────────────────────────────────────────────────
+
 let stompClient = null;
 let codigoSalaAtual = null;
 let minhaFuncao = null;
@@ -24,7 +32,7 @@ function sairDoTerminal() {
 // ─── CONEXÃO ─────────────────────────────────────────────────────────────────
 
 function criarNovaSala() {
-    fetch('/api/sala/criar', { method: 'POST' })
+    fetch(`${BASE_URL}/api/sala/criar`, { method: 'POST' })
         .then(res => res.json())
         .then(sala => {
             document.getElementById('inputCodigoSala').value = sala.codigo;
@@ -45,13 +53,15 @@ function conectarAoLobby() {
     sessionStorage.setItem('nomeAgente', nome);
     sessionStorage.setItem('codigoSala', codigo);
     sessionStorage.setItem('minhaFuncao', minhaFuncao || '');
+    const nomeEquipe = document.getElementById('inputNomeEquipe') ? document.getElementById('inputNomeEquipe').value.trim() : '';
+    sessionStorage.setItem('nomeEquipe', nomeEquipe);
 
     codigoSalaAtual = codigo;
     _iniciarConexaoStomp(nome, codigo);
 }
 
 function _iniciarConexaoStomp(nome, codigo) {
-    const socket = new SockJS('/ws-jogo');
+    const socket = new SockJS(`${BASE_URL}/ws-jogo`);
     stompClient = Stomp.over(socket);
     stompClient.debug = null;
 
@@ -72,7 +82,8 @@ function _iniciarConexaoStomp(nome, codigo) {
 
         stompClient.send(`/app/sala/${codigo}/acao`, {}, JSON.stringify({
             tipo: 'ENTRAR',
-            nomeJogador: nome
+            nomeJogador: nome,
+            funcaoDefinida: sessionStorage.getItem('nomeEquipe') || ''
         }));
 
         const funcaoSalva = sessionStorage.getItem('minhaFuncao');
@@ -150,6 +161,23 @@ function fecharModalFio() {
     document.getElementById('modal-confirmar-fio').style.display = 'none';
 }
 
+// ── FASE 2: ALINHAMENTO QUÂNTICO ─────────────────────────────────────────────
+
+function inserirSequenciaQuadrantes() {
+    const v1 = document.getElementById('quadrante1') ? document.getElementById('quadrante1').value.trim() : '';
+    const v2 = document.getElementById('quadrante2') ? document.getElementById('quadrante2').value.trim() : '';
+    const v3 = document.getElementById('quadrante3') ? document.getElementById('quadrante3').value.trim() : '';
+
+    if (!v1 || !v2 || !v3) return mostrarErro("Preencha os três quadrantes!");
+
+    stompClient.send(`/app/sala/${codigoSalaAtual}/acao`, {}, JSON.stringify({
+        tipo: 'INSERIR_SEQUENCIA',
+        funcaoDefinida: `${v1},${v2},${v3}`
+    }));
+}
+
+// ── FASE 3: TOKENS ────────────────────────────────────────────────────────────
+
 function validarChaveAlfa() {
     const input = document.getElementById('chaveAlfaInput');
     if (!input || !input.value.trim()) return mostrarErro("Insira o valor da Chave Alfa!");
@@ -178,6 +206,18 @@ function avancarParaPainelC() {
     }));
 }
 
+// ── Token enviado pelo Investigador diretamente da sua tela ──────────────────
+function enviarTokenInvestigador() {
+    const input = document.getElementById('tokenInvestigadorInput');
+    if (!input || !input.value.trim()) return mostrarErro("Insira o Token de Infecção!");
+
+    stompClient.send(`/app/sala/${codigoSalaAtual}/acao`, {}, JSON.stringify({
+        tipo: 'INTERCEPTAR_TOKEN',
+        nomeJogador: input.value.trim()
+    }));
+    input.value = '';
+}
+
 // ─── INVESTIGADOR ─────────────────────────────────────────────────────────────
 
 function verificarBlocoNotas() {
@@ -191,10 +231,12 @@ function verificarBlocoNotas() {
 function tentarDesarmarFinal() {
     const inputCodigo = document.getElementById('inputCodigo');
     const inputValor = document.getElementById('inputValor');
+    const inputToken = document.getElementById('inputTokenFase4');
     const codigo = inputCodigo ? inputCodigo.value.trim() : '';
     const valor = inputValor ? inputValor.value.trim() : '';
+    const token = inputToken ? inputToken.value.trim() : '';
 
-    if (!codigo || !valor) return mostrarErro("Preencha todos os parâmetros de desarme do Painel C!");
+    if (!codigo || !valor || !token) return mostrarErro("Preencha todos os parâmetros de desarme do Painel C!");
 
     if (!/^\d+(-\d+){4}$/.test(codigo)) {
         return mostrarErro("Formato inválido! Use o padrão X-X-X-X-X (ex: 57-6-18-7-31)");
@@ -204,9 +246,13 @@ function tentarDesarmarFinal() {
         return mostrarErro("O Escalar deve ser um número inteiro.");
     }
 
+    if (!/^\d+$/.test(token)) {
+        return mostrarErro("O Token de Verificação deve ser um número inteiro.");
+    }
+
     stompClient.send(`/app/sala/${codigoSalaAtual}/acao`, {}, JSON.stringify({
         tipo: 'TENTAR_DESARME',
-        funcaoDefinida: `${codigo},${valor}`
+        funcaoDefinida: `${codigo},${valor},${token}`
     }));
 }
 
@@ -231,6 +277,7 @@ function atualizarContadorErros(falhas) {
 // ─── SINCRONIZAÇÃO CENTRAL ───────────────────────────────────────────────────
 
 function sincronizarEstadoJogo(sala, rankingGeral) {
+    // 1. Timer
     const minutos = Math.floor(sala.tempoRestante / 60);
     const segundos = sala.tempoRestante % 60;
     const timerEl = document.getElementById('timerDisplay');
@@ -239,8 +286,10 @@ function sincronizarEstadoJogo(sala, rankingGeral) {
         timerEl.style.color = sala.tempoRestante <= 300 ? '#ff6b6b' : 'var(--accent-color)';
     }
 
+    // 2. Contador de erros
     atualizarContadorErros(sala.falhasGlobais || 0);
 
+    // 3. Lockdown
     const lockdownUI = document.getElementById('lockdown-screen');
     if (sala.lockdownAtivo) {
         lockdownUI.style.display = 'flex';
@@ -250,6 +299,7 @@ function sincronizarEstadoJogo(sala, rankingGeral) {
         lockdownUI.style.display = 'none';
     }
 
+    // 4. Lobby — botão de início e bloqueio de funções
     const nomeUsuarioLogado = document.getElementById('inputNomeJogador').value.trim();
     const totalFuncoes = Object.values(sala.jogadores || {}).map(j => j.funcao).filter(f => f && f !== 'ESPECTADOR');
     const funcoesUnicas = new Set(totalFuncoes);
@@ -271,6 +321,7 @@ function sincronizarEstadoJogo(sala, rankingGeral) {
         }
     });
 
+    // 5. Mudança de tela ao iniciar
     if (sala.jogoIniciado && !sala.jogoDesarmado) {
         jogoEmAndamento = true;
         if (minhaFuncao === 'OPERADOR')     changeScreen('screen-operador');
@@ -279,16 +330,27 @@ function sincronizarEstadoJogo(sala, rankingGeral) {
         if (minhaFuncao === 'INVESTIGADOR') changeScreen('screen-investigador');
     }
 
+    // 6. Sub-fases do Operador
+    // Fase 1: Fios | Fase 2: Alinhamento Quântico | Fase 3: Tokens | Fase 4: Aguardando Desarme
     if (minhaFuncao === 'OPERADOR' && sala.jogoIniciado) {
         const f1 = document.getElementById('op-fase1');
         const f2 = document.getElementById('op-fase2');
         const f3 = document.getElementById('op-fase3');
+        const f4 = document.getElementById('op-fase4');
         const btnAvancar = document.getElementById('btnAvancarPainelC');
 
         if (sala.faseAtualOperador === 1) {
-            f1.style.display = 'block'; f2.style.display = 'none'; f3.style.display = 'none';
+            f1.style.display = 'block'; f2.style.display = 'none';
+            f3.style.display = 'none';  f4.style.display = 'none';
+
         } else if (sala.faseAtualOperador === 2) {
-            f1.style.display = 'none'; f2.style.display = 'block'; f3.style.display = 'none';
+            f1.style.display = 'none'; f2.style.display = 'block';
+            f3.style.display = 'none'; f4.style.display = 'none';
+
+        } else if (sala.faseAtualOperador === 3) {
+            f1.style.display = 'none'; f2.style.display = 'none';
+            f3.style.display = 'block'; f4.style.display = 'none';
+
             if (sala.dadosInterceptadosFase2 && sala.dadosInterceptadosFase3) {
                 btnAvancar.style.display = 'block';
             } else {
@@ -298,27 +360,49 @@ function sincronizarEstadoJogo(sala, rankingGeral) {
             const tokenOk = document.getElementById('token-infect-ok');
             if (chaveOk) chaveOk.style.display = sala.dadosInterceptadosFase2 ? 'inline' : 'none';
             if (tokenOk) tokenOk.style.display = sala.dadosInterceptadosFase3 ? 'inline' : 'none';
-        } else if (sala.faseAtualOperador === 3) {
-            f1.style.display = 'none'; f2.style.display = 'none'; f3.style.display = 'block';
+
+        } else if (sala.faseAtualOperador === 4) {
+            f1.style.display = 'none'; f2.style.display = 'none';
+            f3.style.display = 'none'; f4.style.display = 'block';
         }
     }
 
+    // 7. Analista — fases
+    // Fase 1: standby | Fase 2: mostra figuras/regras para descobrir a ordem | Fase 3+: Chave Alfa
     if (minhaFuncao === 'ANALISTA') {
-        const pistaF1 = document.getElementById('pista-fase1-analista-aguardo');
-        const pistaF2 = document.getElementById('pista-fase2-analista');
-        if (pistaF1) pistaF1.style.display = sala.faseAtualOperador < 2 ? 'block' : 'none';
-        if (pistaF2) pistaF2.style.display = sala.faseAtualOperador >= 2 ? 'block' : 'none';
+        const pistaF1  = document.getElementById('pista-fase1-analista-aguardo');
+        const pistaF2  = document.getElementById('pista-fase2-analista-quantico');
+        const pistaF3  = document.getElementById('pista-fase2-analista'); // Chave Alfa (era fase 2, agora fase 3)
+
+        if (pistaF1)  pistaF1.style.display  = sala.faseAtualOperador < 2  ? 'block' : 'none';
+        if (pistaF2)  pistaF2.style.display  = sala.faseAtualOperador === 2 ? 'block' : 'none';
+        if (pistaF3)  pistaF3.style.display  = sala.faseAtualOperador >= 3  ? 'block' : 'none';
     }
 
+    // 8. Investigador — fases
+    // Fase 3+: token de infecção | Fase 4: formulário de desarme
     if (minhaFuncao === 'INVESTIGADOR') {
-        document.getElementById('pista-fase2-investigador').style.display = sala.faseAtualOperador >= 2 ? 'block' : 'none';
-        document.getElementById('formulario-desarme-final').style.display = sala.faseAtualOperador === 3 ? 'block' : 'none';
+        const pistaInv = document.getElementById('pista-fase2-investigador');
+        const formDes  = document.getElementById('formulario-desarme-final');
+        if (pistaInv) pistaInv.style.display = sala.faseAtualOperador >= 3 ? 'block' : 'none';
+        if (formDes)  formDes.style.display  = sala.faseAtualOperador === 4 ? 'block' : 'none';
     }
 
+    // 9. Especialista — fase 4 (calibração final)
     if (minhaFuncao === 'ESPECIALISTA') {
-        document.getElementById('pista-fase3-especialista').style.display = sala.faseAtualOperador === 3 ? 'block' : 'none';
+        const pistaEsp = document.getElementById('pista-fase3-especialista');
+        if (pistaEsp) pistaEsp.style.display = sala.faseAtualOperador === 4 ? 'block' : 'none';
     }
 
+    // 10. Derrota (tempo esgotado)
+    if (sala.jogoEncerradoPorTempo && !sala.jogoDesarmado) {
+        jogoEmAndamento = false;
+        sessionStorage.clear();
+        changeScreen('screen-derrota');
+        return;
+    }
+
+    // 11. Vitória
     if (sala.jogoDesarmado) {
         jogoEmAndamento = false;
         sessionStorage.clear();
@@ -331,7 +415,7 @@ function sincronizarEstadoJogo(sala, rankingGeral) {
                 if (item.sala === codigoSalaAtual) tr.style.background = "rgba(34, 197, 94, 0.2)";
                 tr.innerHTML = `
                     <td><strong>${index + 1}º</strong></td>
-                    <td>${item.sala}</td>
+                    <td>${item.nomeEquipe || item.sala}</td>
                     <td>${item.tempoGasto}s</td>
                     <td>${item.errosCometidos || 0}</td>
                 `;

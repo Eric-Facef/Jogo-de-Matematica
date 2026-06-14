@@ -38,7 +38,7 @@ public class JogoController {
         return RANKING_GERAL;
     }
 
-    // ── CRONÔMETRO GLOBAL (tick a cada segundo) ──────────────────
+    // ── CRONÔMETRO GLOBAL ─────────────────────────────────────────
     @Scheduled(fixedRate = 1000)
     public void atualizarCronometrosGlobais() {
         try {
@@ -50,10 +50,14 @@ public class JogoController {
             for (Sala sala : salas.values()) {
                 if (!sala.isJogoIniciado() || sala.isJogoDesarmado()) continue;
 
-                // Proteção contra tempo negativo
                 if (sala.getTempoRestante() <= 0) {
                     sala.setTempoRestante(0);
-                    // Sala sem tempo: marca para limpeza após broadcast final
+                    sala.setJogoEncerradoPorTempo(true);
+                    // Broadcast final antes de fechar
+                    Map<String, Object> pacoteFinal = new HashMap<>();
+                    pacoteFinal.put("sala", sala);
+                    pacoteFinal.put("rankingGeral", RANKING_GERAL);
+                    messagingTemplate.convertAndSend("/topic/sala/" + sala.getCodigo(), pacoteFinal);
                     paraCerrar.add(sala.getCodigo());
                 } else {
                     sala.decrementarTempo();
@@ -65,7 +69,6 @@ public class JogoController {
                 messagingTemplate.convertAndSend("/topic/sala/" + sala.getCodigo(), pacote);
             }
 
-            // Remove salas que esgotaram o tempo (sem vencedor)
             for (String cod : paraCerrar) {
                 lobbyService.fecharSala(cod);
             }
@@ -101,7 +104,13 @@ public class JogoController {
                         ? payload.getNomeJogador().trim() : "Agente_Anônimo";
                 Jogador novo = new Jogador(idSessao, nome);
                 sala.adicionarJogador(idSessao, novo);
-                if (sala.getNomeHost() == null) sala.setNomeHost(nome);
+                if (sala.getNomeHost() == null) {
+                    sala.setNomeHost(nome);
+                    // Nome da equipe só vem do criador da sala
+                    if (payload.getFuncaoDefinida() != null && !payload.getFuncaoDefinida().isBlank()) {
+                        sala.setNomeEquipe(payload.getFuncaoDefinida().trim());
+                    }
+                }
                 break;
             }
 
@@ -134,8 +143,10 @@ public class JogoController {
                 break;
             }
 
+            // ── FASE 1: CORTAR FIO ────────────────────────────────
             case "CORTAR_FIO": {
                 if ("VERMELHO".equals(payload.getFuncaoDefinida())) {
+                    // Fio correto → avança para Fase 2 (Alinhamento Quântico)
                     sala.setFaseAtualOperador(2);
                     sala.setFalhasGlobais(0);
                 } else {
@@ -144,13 +155,23 @@ public class JogoController {
                 break;
             }
 
-            case "AVANCAR_PAINEL_C": {
-                sala.setFaseAtualOperador(3);
-                sala.setFalhasGlobais(0);
+            // ── FASE 2: ALINHAMENTO QUÂNTICO ─────────────────────
+            // Operador insere a sequência "6,9,2" fornecida pelo Analista
+            case "INSERIR_SEQUENCIA": {
+                String sequencia = payload.getFuncaoDefinida() != null
+                        ? payload.getFuncaoDefinida().trim() : "";
+                if ("6,9,2".equals(sequencia)) {
+                    sala.setSequenciaQuadrantesCorreta(true);
+                    sala.setFaseAtualOperador(3);
+                    sala.setFalhasGlobais(0);
+                } else {
+                    sala.aplicarPenalidadeGlobal();
+                }
                 break;
             }
 
-            // Chave Alfa enviada pelo Analista ao Operador
+            // ── FASE 3: TOKENS ────────────────────────────────────
+            // Chave Alfa enviada pelo Analista
             case "INTERCEPTAR_DADOS": {
                 String token = payload.getNomeJogador() != null
                         ? payload.getNomeJogador().trim() : "";
@@ -162,7 +183,7 @@ public class JogoController {
                 break;
             }
 
-            // Token de Infecção enviado pelo Investigador ao Operador
+            // Token de Infecção enviado pelo Investigador
             case "INTERCEPTAR_TOKEN": {
                 String token = payload.getNomeJogador() != null
                         ? payload.getNomeJogador().trim() : "";
@@ -174,24 +195,35 @@ public class JogoController {
                 break;
             }
 
+            case "AVANCAR_PAINEL_C": {
+                // Só avança se os dois tokens da fase 3 foram aceitos
+                if (sala.isDadosInterceptadosFase2() && sala.isDadosInterceptadosFase3()) {
+                    sala.setFaseAtualOperador(4);
+                    sala.setFalhasGlobais(0);
+                }
+                break;
+            }
+
+            // ── FASE 4: DESARME FINAL ─────────────────────────────
             case "TENTAR_DESARME": {
                 if (payload.getFuncaoDefinida() == null) break;
                 String[] dados = payload.getFuncaoDefinida().split(",");
-                if (dados.length == 2
+                if (dados.length == 3
                         && "57-6-18-7-31".equals(dados[0].trim())
-                        && "27".equals(dados[1].trim())) {
+                        && "17".equals(dados[1].trim())
+                        && "7".equals(dados[2].trim())) {
 
                     sala.setJogoDesarmado(true);
 
                     long tempoGasto = sala.calcularTempoGastoSegundos();
                     Map<String, Object> dadosEquipe = new HashMap<>();
                     dadosEquipe.put("sala", sala.getCodigo());
+                    dadosEquipe.put("nomeEquipe", sala.getNomeEquipe() != null ? sala.getNomeEquipe() : sala.getCodigo());
                     dadosEquipe.put("tempoGasto", tempoGasto);
                     dadosEquipe.put("errosCometidos", sala.getFalhasGlobais());
                     RANKING_GERAL.add(dadosEquipe);
                     RANKING_GERAL.sort(Comparator.comparingLong(m -> (Long) m.get("tempoGasto")));
 
-                    // Agenda limpeza da sala após 60s (tempo para o front exibir vitória)
                     new Thread(() -> {
                         try { Thread.sleep(60_000); } catch (InterruptedException ignored) {}
                         lobbyService.fecharSala(sala.getCodigo());
