@@ -13,7 +13,6 @@ function changeScreen(screenId) {
     if (target) target.classList.add('active');
 }
 
-// Bloqueia saída durante o jogo
 function sairDoTerminal() {
     if (jogoEmAndamento) {
         alert("⚠️ Protocolo ativo! Não é possível sair do terminal durante a missão.");
@@ -25,13 +24,13 @@ function sairDoTerminal() {
 // ─── CONEXÃO ─────────────────────────────────────────────────────────────────
 
 function criarNovaSala() {
-    fetch('http://localhost:8080/api/sala/criar', { method: 'POST' })
+    fetch('/api/sala/criar', { method: 'POST' })
         .then(res => res.json())
         .then(sala => {
             document.getElementById('inputCodigoSala').value = sala.codigo;
             document.getElementById('lobbyStatusMsg').innerText = `Sala Criada: ${sala.codigo}. Insira seu codinome e clique em ENTRAR.`;
         })
-        .catch(() => alert("Erro ao conectar com o servidor Spring Boot na porta 8080."));
+        .catch(() => alert("Erro ao conectar com o servidor."));
 }
 
 function conectarAoLobby() {
@@ -43,7 +42,6 @@ function conectarAoLobby() {
         return;
     }
 
-    // Salva em sessionStorage para reconexão
     sessionStorage.setItem('nomeAgente', nome);
     sessionStorage.setItem('codigoSala', codigo);
     sessionStorage.setItem('minhaFuncao', minhaFuncao || '');
@@ -53,7 +51,7 @@ function conectarAoLobby() {
 }
 
 function _iniciarConexaoStomp(nome, codigo) {
-    const socket = new SockJS('http://localhost:8080/ws-jogo');
+    const socket = new SockJS('/ws-jogo');
     stompClient = Stomp.over(socket);
     stompClient.debug = null;
 
@@ -77,14 +75,12 @@ function _iniciarConexaoStomp(nome, codigo) {
             nomeJogador: nome
         }));
 
-        // Restaura função se reconectou durante o jogo
         const funcaoSalva = sessionStorage.getItem('minhaFuncao');
         if (funcaoSalva && funcaoSalva !== '' && funcaoSalva !== 'null') {
             minhaFuncao = funcaoSalva;
         }
 
     }, function () {
-        // Callback de erro — tenta reconexão automática
         if (tentativasReconexao < MAX_RECONEXOES) {
             tentativasReconexao++;
             const msg = document.getElementById('lobbyStatusMsg');
@@ -134,7 +130,6 @@ function cortarFio(cor) {
     const nomesFios = { AZUL: 'Azul', VERMELHO: 'Vermelho', AMARELO: 'Amarelo', VERDE: 'Verde' };
     const cores = { AZUL: '#1e3a8a', VERMELHO: '#991b1b', AMARELO: '#78350f', VERDE: '#14532d' };
 
-    // Modal de confirmação antes de cortar
     const modal = document.getElementById('modal-confirmar-fio');
     const textoModal = document.getElementById('modal-fio-nome');
     const btnModal = document.getElementById('modal-fio-btn');
@@ -201,12 +196,10 @@ function tentarDesarmarFinal() {
 
     if (!codigo || !valor) return mostrarErro("Preencha todos os parâmetros de desarme do Painel C!");
 
-    // Valida formato do código estrutural (ex: 57-6-18-7-31)
     if (!/^\d+(-\d+){4}$/.test(codigo)) {
         return mostrarErro("Formato inválido! Use o padrão X-X-X-X-X (ex: 57-6-18-7-31)");
     }
 
-    // Valida que o escalar é numérico
     if (!/^\d+$/.test(valor)) {
         return mostrarErro("O Escalar deve ser um número inteiro.");
     }
@@ -238,7 +231,6 @@ function atualizarContadorErros(falhas) {
 // ─── SINCRONIZAÇÃO CENTRAL ───────────────────────────────────────────────────
 
 function sincronizarEstadoJogo(sala, rankingGeral) {
-    // 1. Timer
     const minutos = Math.floor(sala.tempoRestante / 60);
     const segundos = sala.tempoRestante % 60;
     const timerEl = document.getElementById('timerDisplay');
@@ -247,10 +239,8 @@ function sincronizarEstadoJogo(sala, rankingGeral) {
         timerEl.style.color = sala.tempoRestante <= 300 ? '#ff6b6b' : 'var(--accent-color)';
     }
 
-    // 2. Contador de erros (visível em todas as telas)
     atualizarContadorErros(sala.falhasGlobais || 0);
 
-    // 3. Lockdown
     const lockdownUI = document.getElementById('lockdown-screen');
     if (sala.lockdownAtivo) {
         lockdownUI.style.display = 'flex';
@@ -260,7 +250,6 @@ function sincronizarEstadoJogo(sala, rankingGeral) {
         lockdownUI.style.display = 'none';
     }
 
-    // 4. Lobby — botão de início e botões de função
     const nomeUsuarioLogado = document.getElementById('inputNomeJogador').value.trim();
     const totalFuncoes = Object.values(sala.jogadores || {}).map(j => j.funcao).filter(f => f && f !== 'ESPECTADOR');
     const funcoesUnicas = new Set(totalFuncoes);
@@ -282,7 +271,6 @@ function sincronizarEstadoJogo(sala, rankingGeral) {
         }
     });
 
-    // 5. Mudança de tela ao iniciar
     if (sala.jogoIniciado && !sala.jogoDesarmado) {
         jogoEmAndamento = true;
         if (minhaFuncao === 'OPERADOR')     changeScreen('screen-operador');
@@ -291,7 +279,6 @@ function sincronizarEstadoJogo(sala, rankingGeral) {
         if (minhaFuncao === 'INVESTIGADOR') changeScreen('screen-investigador');
     }
 
-    // 6. Sub-fases do Operador
     if (minhaFuncao === 'OPERADOR' && sala.jogoIniciado) {
         const f1 = document.getElementById('op-fase1');
         const f2 = document.getElementById('op-fase2');
@@ -307,7 +294,6 @@ function sincronizarEstadoJogo(sala, rankingGeral) {
             } else {
                 btnAvancar.style.display = 'none';
             }
-            // Feedback visual de quais tokens já foram aceitos
             const chaveOk = document.getElementById('chave-alfa-ok');
             const tokenOk = document.getElementById('token-infect-ok');
             if (chaveOk) chaveOk.style.display = sala.dadosInterceptadosFase2 ? 'inline' : 'none';
@@ -317,7 +303,6 @@ function sincronizarEstadoJogo(sala, rankingGeral) {
         }
     }
 
-    // 7. Pistas por fase — Analista
     if (minhaFuncao === 'ANALISTA') {
         const pistaF1 = document.getElementById('pista-fase1-analista-aguardo');
         const pistaF2 = document.getElementById('pista-fase2-analista');
@@ -325,18 +310,15 @@ function sincronizarEstadoJogo(sala, rankingGeral) {
         if (pistaF2) pistaF2.style.display = sala.faseAtualOperador >= 2 ? 'block' : 'none';
     }
 
-    // 8. Pistas por fase — Investigador
     if (minhaFuncao === 'INVESTIGADOR') {
         document.getElementById('pista-fase2-investigador').style.display = sala.faseAtualOperador >= 2 ? 'block' : 'none';
         document.getElementById('formulario-desarme-final').style.display = sala.faseAtualOperador === 3 ? 'block' : 'none';
     }
 
-    // 9. Pista fase 3 — Especialista
     if (minhaFuncao === 'ESPECIALISTA') {
         document.getElementById('pista-fase3-especialista').style.display = sala.faseAtualOperador === 3 ? 'block' : 'none';
     }
 
-    // 10. Vitória
     if (sala.jogoDesarmado) {
         jogoEmAndamento = false;
         sessionStorage.clear();
