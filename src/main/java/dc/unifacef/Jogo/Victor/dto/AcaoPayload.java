@@ -4,6 +4,7 @@ public class AcaoPayload {
     private String tipo;
     private String nomeJogador;
     private String funcaoDefinida;
+    private String nomeEquipe;
 
     public String getTipo() { return tipo; }
     public void setTipo(String tipo) { this.tipo = tipo; }
@@ -13,4 +14,7 @@ public class AcaoPayload {
 
     public String getFuncaoDefinida() { return funcaoDefinida; }
     public void setFuncaoDefinida(String funcaoDefinida) { this.funcaoDefinida = funcaoDefinida; }
+
+    public String getNomeEquipe() { return nomeEquipe; }
+    public void setNomeEquipe(String nomeEquipe) { this.nomeEquipe = nomeEquipe; }
 }

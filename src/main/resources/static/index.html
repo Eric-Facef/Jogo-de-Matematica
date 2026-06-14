@@ -38,10 +38,10 @@
     <p style="text-align:center; color: #6b7280; margin: 0; font-size: 0.75rem;">Módulo Remoto de Desativação - Protocolo Baseado em Eventos</p>
 
     <!-- HUD GLOBAL: Timer + Contador de Erros -->
-    <div style="display:flex; justify-content:space-between; align-items:center; margin: 10px 0 5px 0; padding: 0 4px;">
+    <div style="display:flex; justify-content:center; align-items:center; margin: 10px 0 5px 0; gap: 20px;">
         <div class="bomba-graphics" style="margin:0;">
             <div class="bomba-corpo" style="width:80px; height:80px;">
-                <div class="timer-box" id="timerDisplay">25:00</div>
+                <div class="timer-box" id="timerDisplay">30:00</div>
             </div>
         </div>
         <div id="contador-erros" style="font-size:0.85rem; color:#fbbf24; font-weight:bold; text-align:right;">⚠️ Falhas: 0/3</div>
@@ -57,7 +57,7 @@
         <div class="terminal-input" style="margin: 10px 0;">
             <div style="display: flex; flex-direction: column; gap: 8px;">
                 <input type="text" id="inputNomeJogador" placeholder="SEU CODINOME DE AGENTE">
-                <input type="text" id="inputNomeEquipe" placeholder="NOME DA EQUIPE (só para quem cria a sala)" style="border-color: #a855f7; color: #a855f7;">
+                <input type="text" id="inputNomeEquipe" placeholder="NOME DA EQUIPE (só para quem cria a sala)" style="border-color: #a855f7; color: #a855f7;" disabled>
                 <div style="display: flex; gap: 10px; width: 100%;">
                     <button onclick="criarNovaSala()" style="background: #111; font-size: 0.8rem;">CRIAR SALA</button>
                     <input type="text" id="inputCodigoSala" placeholder="CÓDIGO" style="max-width: 110px; text-transform: uppercase;">
@@ -82,7 +82,7 @@
     <!-- TELA: OPERADOR                                            -->
     <!-- ══════════════════════════════════════════════════════════ -->
     <div id="screen-operador" class="screen">
-        <div class="nav-back"><button onclick="sairDoTerminal()">← Sair do Terminal</button></div>
+        
         <h2>Painel Principal do Operador</h2>
 
         <!-- FASE 1: FIOS -->
@@ -92,31 +92,7 @@
                 <p>O circuito principal está energizado. Corte o fio correto indicado pela equipe para liberar os barramentos de dados.</p>
             </div>
 
-            <div class="pista-item" style="border-left: 3px solid var(--cyber-blue); margin-bottom: 15px;">
-                <span style="color: var(--cyber-blue); font-weight: bold;">🔋 LEITURA DO HARDWARE FÍSICO</span>
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; flex-wrap: wrap; gap: 10px;">
-                    <div>
-                        <p style="color: #aaa; font-size: 0.8rem; margin-bottom: 6px;">BARRAMENTO DE SÍMBOLOS (A→E):</p>
-                        <div style="display: flex; gap: 8px; font-size: 1.3rem; font-weight: bold; color: var(--green-glow); letter-spacing: 4px;">
-                            <span style="border: 1px solid #333; padding: 4px 8px; border-radius: 4px;">31</span>
-                            <span style="border: 1px solid #333; padding: 4px 8px; border-radius: 4px;">7</span>
-                            <span style="border: 1px solid #333; padding: 4px 8px; border-radius: 4px;">18</span>
-                            <span style="border: 1px solid #333; padding: 4px 8px; border-radius: 4px;">6</span>
-                            <span style="border: 1px solid #333; padding: 4px 8px; border-radius: 4px;">57</span>
-                        </div>
-                    </div>
-                    <div>
-                        <p style="color: #aaa; font-size: 0.8rem; margin-bottom: 6px;">PILHAS DETECTADAS:</p>
-                        <div style="display: flex; gap: 4px;">
-                            <span style="font-size: 1.4rem;">🔋</span>
-                            <span style="font-size: 1.4rem;">🔋</span>
-                            <span style="font-size: 1.4rem;">🔋</span>
-                            <span style="font-size: 1.4rem;">🔋</span>
-                        </div>
-                        <p style="color: var(--accent-color); font-size: 0.85rem; font-weight: bold; margin-top: 4px;">4 PILHAS</p>
-                    </div>
-                </div>
-            </div>
+           
 
             <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
                 <button onclick="cortarFio('AZUL')"     class="btn wire-btn" style="background: #1e3a8a; color: white; font-weight: bold; border-left: 6px solid #60a5fa;">━━ FIO AZUL</button>
@@ -163,7 +139,7 @@
             </div>
 
             <div class="terminal-input">
-                <p>Insira a Chave Alfa (Fornecida pelos Analistas): <span id="chave-alfa-ok" style="display:none; color:var(--green-glow);">✓ ACEITA</span></p>
+                <p>Insira a Chave Alfa (Fornecida pelo Investigador): <span id="chave-alfa-ok" style="display:none; color:var(--green-glow);">✓ ACEITA</span></p>
                 <div style="display: flex; gap: 5px;">
                     <input type="text" id="chaveAlfaInput" placeholder="Aguardando Hash...">
                     <button onclick="validarChaveAlfa()">INJECT ALPHA</button>
@@ -171,7 +147,7 @@
             </div>
 
             <div class="terminal-input" style="margin-top: 15px;">
-                <p>Insira o Token de Infecção (Fornecido pelo Investigador): <span id="token-infect-ok" style="display:none; color:var(--green-glow);">✓ ACEITO</span></p>
+                <p>Insira o Token de Infecção (Fornecido pelos Analistas): <span id="token-infect-ok" style="display:none; color:var(--green-glow);">✓ ACEITO</span></p>
                 <div style="display: flex; gap: 5px;">
                     <input type="text" id="tokenInfectInput" placeholder="Aguardando Vetor...">
                     <button onclick="validarTokenInfect()">RUN EXPLOIT</button>
@@ -201,7 +177,34 @@
         <h2>Manual Digital de Desarme Secundário</h2>
         <p style="margin-bottom: 15px; font-size:0.9rem;">Analise as tabelas lógicas internas do hardware para instruir o Investigador e os Analistas.</p>
 
-        <h3>Tabela I: Equações de Frequência dos Fios (Módulo B)</h3>
+        <h2>Procedimento Primário</h2>
+        <div class="pista-item" style="border-left: 3px solid #a855f7; margin-top: 10px;">
+            Se houver dois fios com resultados idênticos:
+            - E o número de pilhas for ímpar, corte o fio com menor resultado.
+
+            - E o número de pilhas for par, corte o fio verde.
+
+            Se todos os resultados forem diferentes:
+            - Verifique se existe algum resultado negativo, caso exista apenas um resultado negativo e ele for maior que -3 então corte o fio azul.
+            - Se houver dois resultados negativos então corte o fio que é divisível por 3
+
+            Se existir um fio PRETO:
+            - Corte imediatamente o fio embaixo dele se for negativo.
+            - corte imediatamente o fio de cima se for positivo
+
+            Se os resultados estiverem em ordem crescente de cima para baixo:
+            - Corte o último fio.
+            Se estiverem em ordem decrescente:
+            - Corte o primeiro fio.
+
+            Conte quantos resultados inteiros positivos existem.
+            - Se houver exatamente três, corte o fio com maior valor.
+
+            - Se todos forem positivo corte o fio com maior resultado.
+
+            Se nenhuma das condições anteriores for satisfeita, corte o fio correspondente ao menor resultado positivo.
+        </div>
+        <h3>Tabela I (Utilizar na Seção 1): Equações de Frequência dos Fios (Módulo B)</h3>
         <table>
             <thead>
                 <tr><th>Fio</th><th>Equação de Ressonância</th><th>Resultado (X)</th></tr>
@@ -214,15 +217,15 @@
             </tbody>
         </table>
 
-        <h3 style="margin-top: 20px;">Tabela II: Alinhamento Quântico — Figuras do Barramento</h3>
+        <h3 style="margin-top: 20px;">Tabela II (Utilizar na Seção 3): Alinhamento Quântico — Figuras do Barramento</h3>
         <table>
             <thead>
-                <tr><th>Equação</th><th>Resultado</th></tr>
+                <tr><th>Equação</th></tr>
             </thead>
             <tbody>
-                <tr><td>🟢 − 🟦 = ?</td><td>?</td></tr>
-                <tr><td>🟦 + 🔺 = ?</td><td>?</td></tr>
-                <tr><td>🟢 − 🔺 = ?</td><td>?</td></tr>
+                <tr><td>🟢 − 🟦 = -3</td></tr>
+                <tr><td>🟦 + 🔺 = 11</td></tr>
+                <tr><td>🟢 − 🔺 = 4</td></tr>
             </tbody>
         </table>
         <div class="pista-item" style="border-left: 3px solid #a855f7; margin-top: 10px;">
@@ -235,7 +238,7 @@
             <span style="color:#fbbf24;">⚠️ Verifique as condições nessa ordem — pare na primeira que for verdadeira.</span></p>
         </div>
 
-        <h3 style="margin-top: 20px;">Tabela III: Modulação do Escalar — Contas A e B</h3>
+        <h3 style="margin-top: 20px;">Tabela III (Utilizar na Seção 4): Modulação do Escalar — Contas A e B</h3>
         <table>
             <thead>
                 <tr><th>Variável</th><th>Equação</th></tr>
@@ -246,19 +249,19 @@
             </tbody>
         </table>
         <div class="pista-item" style="border-left: 3px solid var(--cyber-blue); margin-top: 10px;">
-            <span style="color: var(--cyber-blue); font-weight: bold;">⚙️ SEÇÃO 3: MODULAÇÃO DO ESCALAR — TABELA DE VOLTAGEM (Nº DE PILHAS)</span>
+            <span style="color: var(--cyber-blue); font-weight: bold;">⚙️ SEÇÃO 4: MODULAÇÃO DO ESCALAR — TABELA DE VOLTAGEM (Nº DE PILHAS)</span>
             <table style="margin-top: 10px; width: 100%; font-size: 0.8rem;">
                 <thead><tr><th>Pilhas</th><th>Código Estrutural (ordem)</th><th>Escalar de Ativação</th></tr></thead>
                 <tbody>
                     <tr><td>1 🔋</td><td>Do maior para o menor</td><td>Soma todos × 4 ÷ 10</td></tr>
                     <tr><td>2 🔋</td><td>Do menor para o maior</td><td>Maior × menor ÷ 2º menor</td></tr>
                     <tr><td>3 🔋</td><td>Mesma ordem do barramento</td><td>Soma só os pares ÷ 2</td></tr>
-                    <tr><td><strong>4 🔋</strong></td><td><strong>Ordem INVERSA do barramento</strong></td><td><strong>(Maior − Menor) ÷ 3</strong></td></tr>
+                    <tr><td>4 🔋</td><td>Ordem INVERSA do barramento</td><td>(Maior − Menor) ÷ 3</td></tr>
                     <tr><td>5 🔋</td><td>Apenas valores de A e B</td><td>Soma todos × 30% (arredondar)</td></tr>
                 </tbody>
             </table>
             <p style="margin-top: 8px; font-size: 0.8rem; color: #aaa;">Use o barramento do Operador e o número de pilhas para calcular a ordem e o escalar a passar ao Investigador.</p>
-            <p style="margin-top: 6px; font-size: 0.8rem; color: #fbbf24;"><strong>⚠️ Lembrete — 4 Pilhas (ordem INVERSA do barramento):</strong> O barramento exibe os símbolos da esquerda para a direita (A→E). Inverta essa sequência para obter o Código Estrutural. O Escalar de Ativação = (maior valor − menor valor) ÷ 3.</p>
+            <p style="margin-top: 6px; font-size: 0.8rem; color: #fbbf24;"><strong>⚠️ Lembrete: Caso necessário alteração na ordem, o barramento exibe os símbolos da esquerda para a direita (A→E).</strong></p>
         </div>
 
         <div id="pista-fase3-especialista" style="display: none; margin-top: 20px;">
@@ -297,7 +300,7 @@
 
         <!-- Fase 2: Alinhamento Quântico — Analista recebe valores do Especialista e descobre a ordem -->
         <div id="pista-fase2-analista-quantico" style="display: none; margin-top: 20px;">
-            <div class="terminal-status" style="color: #a855f7;"><span>🔮 Alinhamento Quântico</span> <span>ATIVO</span></div>
+            <div class="terminal-status" style="color: #a855f7;"><span> Alinhamento Quântico</span> <span>ATIVO</span></div>
             <div class="pista-item" style="border-left: 3px solid #a855f7;">
                 <span style="color: #a855f7; font-weight: bold;">📊 ENIGMA DE CALIBRAÇÃO DOS QUADRANTES</span>
                 <p style="margin-top: 6px;">O Especialista resolverá o sistema de equações das figuras e passará os valores para você. Aplique as regras de ordenação abaixo e comunique a sequência ao Operador.</p>
@@ -343,9 +346,9 @@
                     <p style="color: #aaa; font-size: 0.8rem; margin-bottom: 6px;">BARRAMENTO DE SÍMBOLOS (A→E):</p>
                     <div style="display: flex; gap: 8px; font-size: 1.2rem; font-weight: bold; color: var(--green-glow);">
                         <span style="border: 1px solid #333; padding: 4px 8px; border-radius: 4px;">31</span>
-                        <span style="border: 1px solid #333; padding: 4px 8px; border-radius: 4px;">7</span>
+                        <span style="border: 1px solid #333; padding: 4px 8px; border-radius: 4px;">B</span>
                         <span style="border: 1px solid #333; padding: 4px 8px; border-radius: 4px;">18</span>
-                        <span style="border: 1px solid #333; padding: 4px 8px; border-radius: 4px;">6</span>
+                        <span style="border: 1px solid #333; padding: 4px 8px; border-radius: 4px;">A</span>
                         <span style="border: 1px solid #333; padding: 4px 8px; border-radius: 4px;">57</span>
                     </div>
                 </div>

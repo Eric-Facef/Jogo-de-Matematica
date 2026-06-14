@@ -37,6 +37,7 @@ function criarNovaSala() {
         .then(sala => {
             document.getElementById('inputCodigoSala').value = sala.codigo;
             document.getElementById('lobbyStatusMsg').innerText = `Sala Criada: ${sala.codigo}. Insira seu codinome e clique em ENTRAR.`;
+            document.getElementById('inputNomeEquipe').disabled = false;
         })
         .catch(() => alert("Erro ao conectar com o servidor."));
 }
@@ -83,7 +84,7 @@ function _iniciarConexaoStomp(nome, codigo) {
         stompClient.send(`/app/sala/${codigo}/acao`, {}, JSON.stringify({
             tipo: 'ENTRAR',
             nomeJogador: nome,
-            funcaoDefinida: sessionStorage.getItem('nomeEquipe') || ''
+            nomeEquipe: sessionStorage.getItem('nomeEquipe') || ''
         }));
 
         const funcaoSalva = sessionStorage.getItem('minhaFuncao');
@@ -299,7 +300,14 @@ function sincronizarEstadoJogo(sala, rankingGeral) {
         lockdownUI.style.display = 'none';
     }
 
-    // 4. Lobby — botão de início e bloqueio de funções
+    // 4. Bloqueia nome da equipe para quem entrou (não criou)
+    const inputEquipe = document.getElementById('inputNomeEquipe');
+    if (inputEquipe && sala.nomeEquipe) {
+        inputEquipe.value = sala.nomeEquipe;
+        inputEquipe.disabled = true;
+    }
+
+    // 5. Lobby — botão de início e bloqueio de funções
     const nomeUsuarioLogado = document.getElementById('inputNomeJogador').value.trim();
     const totalFuncoes = Object.values(sala.jogadores || {}).map(j => j.funcao).filter(f => f && f !== 'ESPECTADOR');
     const funcoesUnicas = new Set(totalFuncoes);

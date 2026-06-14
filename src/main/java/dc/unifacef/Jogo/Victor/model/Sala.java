@@ -12,7 +12,7 @@ public class Sala {
     private boolean jogoEncerradoPorTempo = false;
     private long tempoInicialMilis;
 
-    private int tempoRestante = 25 * 60;
+    private int tempoRestante = 30 * 60;
     private int falhasGlobais = 0;
     private boolean lockdownAtivo = false;
     private int tempoLockdown = 0;

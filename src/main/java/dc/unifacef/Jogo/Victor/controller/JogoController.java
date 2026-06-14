@@ -106,9 +106,8 @@ public class JogoController {
                 sala.adicionarJogador(idSessao, novo);
                 if (sala.getNomeHost() == null) {
                     sala.setNomeHost(nome);
-                    // Nome da equipe só vem do criador da sala
-                    if (payload.getFuncaoDefinida() != null && !payload.getFuncaoDefinida().isBlank()) {
-                        sala.setNomeEquipe(payload.getFuncaoDefinida().trim());
+                    if (payload.getNomeEquipe() != null && !payload.getNomeEquipe().isBlank()) {
+                        sala.setNomeEquipe(payload.getNomeEquipe().trim());
                     }
                 }
                 break;
